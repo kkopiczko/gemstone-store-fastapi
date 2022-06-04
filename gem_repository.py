@@ -2,11 +2,10 @@ from main import engine
 from models.gem_models import Gem, GemProperties
 from sqlmodel import Session, select
 
-def select_gems():
+def select_all_gems():
     with Session(bind=engine) as session:
-        statement = select(Gem)
-        statement = statement.where(Gem.id == 2)
+        statement = select(Gem, GemProperties).where(Gem.properties_id == GemProperties.id)
+        # statement = statement.where(Gem.id == 2)
         result = session.exec(statement)
-        print(result.all())
-
-select_gems()
+        # print(result.all())
+        return result.all()
