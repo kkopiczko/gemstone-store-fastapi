@@ -1,7 +1,12 @@
-from sqlalchemy import table
-from sqlmodel import SQLModel, Field
-from enum import Enum
+# from sqlalchemy import table
+from sqlmodel import SQLModel, Field, Relationship
+from enum import Enum as Enum_
 from typing import Optional
+
+class Enum(Enum_):
+    @classmethod
+    def list(cls):
+        return list(map(lambda c: c.value, cls))
 
 class GemClarity(str, Enum):
     SI = 'SI'
@@ -22,16 +27,19 @@ class GemType(str, Enum):
     EMERALD = 'EMERALD'
     RUBY = 'RUBY'
 
-class Gem(SQLModel, table=True):
-    id: Optional[int] = Field(primary_key=True)
-    type: Optional[GemType] = GemType.DIAMOND
-    properties_id: Optional[int] = Field(default=None, foreign_key='gemproperties.id')
-    price: float = 1
-    is_available: bool = True
-    
-
 class GemProperties(SQLModel, table=True):
     id: Optional[int] = Field(primary_key=True)
     size: float = 1
     color: Optional[GemColor] = None
     clarity: Optional[GemClarity] = None
+    gem: Optional['Gem'] = Relationship(back_populates='properties')
+
+class Gem(SQLModel, table=True):
+    id: Optional[int] = Field(primary_key=True)
+    type: Optional[GemType] = GemType.DIAMOND
+    price: float 
+    is_available: bool = True
+    properties_id: Optional[int] = Field(default=None, foreign_key='gemproperties.id')
+    properties: Optional[GemProperties] = Relationship(back_populates='gem')
+    
+
