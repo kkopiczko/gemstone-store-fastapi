@@ -15,5 +15,5 @@ def hello():
     return "Hello there!"
 
 if __name__ == '__main__':
-    uvicorn.run(app, host="localhost", port=8000)
+    uvicorn.run('main:app', host="localhost", port=8000, reload=True)
     create_db_and_tables()
