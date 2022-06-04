@@ -1,4 +1,4 @@
-from main import engine
+from db import engine
 from models.gem_models import Gem, GemProperties
 from sqlmodel import Session, select
 

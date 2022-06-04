@@ -1,12 +1,12 @@
 from fastapi import FastAPI
 import uvicorn
-from sqlmodel import create_engine, SQLModel
+from sqlmodel import SQLModel
 from models.gem_models import *
 import gem_repository 
+from db import engine
 
 app = FastAPI()
 
-engine = create_engine('sqlite:///database.db', echo=True)
 
 def create_db_and_tables():
     SQLModel.metadata.create_all(engine)

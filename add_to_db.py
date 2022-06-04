@@ -1,7 +1,7 @@
 import random
 import string
 from sqlmodel import Session
-from main import engine
+from db import engine
 from models.gem_models import Gem, GemClarity, GemColor, GemProperties, GemType
 
 color_multiplier = {
@@ -29,7 +29,7 @@ def calculate_gem_price(gem: Gem, gem_pr: GemProperties):
 
     price = price * (gem_pr.size**3)
 
-    if gem.gem_type == 'DIAMOND':
+    if gem.type == 'DIAMOND':
         multiplier = color_multiplier[gem_pr.color]
         price *= multiplier
     
@@ -58,7 +58,7 @@ def add_gem_to_db():
         session.add_all(gem_properties)
         session.commit()
         gems = [create_gem(gem_properties[x]) for x in range(100)]
-        session.add(gems)
+        session.add_all(gems)
         session.commit()
 
 add_gem_to_db()
