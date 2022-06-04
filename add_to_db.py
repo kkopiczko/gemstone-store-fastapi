@@ -2,7 +2,7 @@ import random
 import string
 from sqlmodel import Session
 from main import engine
-from models.gem_models import Gem, GemProperties
+from models.gem_models import Gem, GemClarity, GemColor, GemProperties, GemType
 
 color_multiplier = {
     'D': 1.8,
@@ -38,24 +38,27 @@ def calculate_gem_price(gem: Gem, gem_pr: GemProperties):
 
 def create_gem_properties():
     size = random.randint(3, 70)/10
-    color = color_grades[random.randint(0, 5)]
-    clarity = clarity_variants[random.randint(0, 3)]
+    color = random.choice(GemColor.list())
+    clarity = random.choice(GemClarity.list())
     gem_properties = GemProperties(size=size, color=color, clarity=clarity)
     return gem_properties
 
 def create_gem(gem_p):
-    gem = Gem(price=1000, properties_id=gem_p)
+    type = random.choice(GemType.list())
+    gem = Gem(price=1000, properties_id=gem_p.id, type=type)
+    price = calculate_gem_price(gem, gem_p)
+    gem.price = round(price, 2)
     return gem
 
 def add_gem_to_db():
-    gem_properties = create_gem_properties()
+    gem_properties = [create_gem_properties() for x in range(100)]
     print(gem_properties)
 
     with Session(bind=engine) as session:
-        session.add(gem_properties)
+        session.add_all(gem_properties)
         session.commit()
-        g = create_gem(gem_properties.id)
-        session.add(g)
+        gems = [create_gem(gem_properties[x]) for x in range(100)]
+        session.add(gems)
         session.commit()
 
 add_gem_to_db()
