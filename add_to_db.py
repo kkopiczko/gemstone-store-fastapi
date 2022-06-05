@@ -61,4 +61,4 @@ def add_gem_to_db():
         session.add_all(gems)
         session.commit()
 
-add_gem_to_db()
+# add_gem_to_db()
