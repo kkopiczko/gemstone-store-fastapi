@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.encoders import jsonable_encoder
 import uvicorn
 from sqlmodel import SQLModel, Session
 from models.gem_models import *
@@ -33,6 +34,22 @@ def create_gem(gem_pr: GemProperties, gem: Gem):
     session.commit()
     session.refresh(gem_)
     return gem_
+
+@app.patch('/gems/{gem_id}')
+def patch_gem(gem_id: int):
+    pass
+
+@app.put('/gems/{gem_id}')
+def update_gem(gem_id: int, gem: Gem):
+    gem_found = session.get(Gem, gem_id)
+    update_item_encoded = jsonable_encoder(gem)
+    update_item_encoded.pop('id', None)
+    for key, val in update_item_encoded.items():
+        gem_found.__setattr__(key, val)
+    session.commit()
+    session.refresh(gem_found)
+    return gem_found
+    
 
 if __name__ == '__main__':
     uvicorn.run('main:app', host="localhost", port=8000, reload=True)
