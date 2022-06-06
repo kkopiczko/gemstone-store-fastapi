@@ -36,8 +36,15 @@ def create_gem(gem_pr: GemProperties, gem: Gem):
     return gem_
 
 @app.patch('/gems/{gem_id}')
-def patch_gem(gem_id: int):
-    pass
+def patch_gem(gem_id: int, gem: GemPatch):
+    gem_found = session.get(Gem, gem_id)
+    update_data = gem.dict(exclude_unset=True)
+    update_data.pop('id', None)
+    for key, val in update_data.items():
+        gem_found.__setattr__(key, val)
+    session.commit()
+    session.refresh(gem_found)
+    return gem_found
 
 @app.put('/gems/{gem_id}')
 def update_gem(gem_id: int, gem: Gem):
@@ -49,7 +56,7 @@ def update_gem(gem_id: int, gem: Gem):
     session.commit()
     session.refresh(gem_found)
     return gem_found
-    
+
 
 if __name__ == '__main__':
     uvicorn.run('main:app', host="localhost", port=8000, reload=True)
