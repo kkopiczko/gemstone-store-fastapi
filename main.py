@@ -39,7 +39,6 @@ def create_gem(gem_pr: GemProperties, gem: Gem):
 def patch_gem(gem_id: int, gem: GemPatch):
     gem_found = session.get(Gem, gem_id)
     update_data = gem.dict(exclude_unset=True)
-    update_data.pop('id', None)
     for key, val in update_data.items():
         gem_found.__setattr__(key, val)
     session.commit()
