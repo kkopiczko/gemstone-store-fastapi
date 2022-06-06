@@ -1,4 +1,4 @@
-from fastapi import FastAPI, status
+from fastapi import FastAPI, status, HTTPException
 from fastapi.encoders import jsonable_encoder
 import uvicorn
 from sqlmodel import SQLModel, Session
@@ -21,6 +21,8 @@ def get_gems():
 @app.get('/gems/{gem_id}')
 def get_gem_by_id(gem_id: int):
     gem = gem_repository.select_gem_by_id(gem_id)
+    if not gem:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Gem with an id: {gem_id} was not found')
     return {'gem': gem}
 
 @app.post('/gems')
@@ -38,6 +40,8 @@ def create_gem(gem_pr: GemProperties, gem: Gem):
 @app.patch('/gems/{gem_id}')
 def patch_gem(gem_id: int, gem: GemPatch):
     gem_found = session.get(Gem, gem_id)
+    if not gem_found:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Gem with an id: {gem_id} was not found')
     update_data = gem.dict(exclude_unset=True)
     for key, val in update_data.items():
         gem_found.__setattr__(key, val)
@@ -48,6 +52,8 @@ def patch_gem(gem_id: int, gem: GemPatch):
 @app.put('/gems/{gem_id}')
 def update_gem(gem_id: int, gem: Gem):
     gem_found = session.get(Gem, gem_id)
+    if not gem_found:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Gem with an id: {gem_id} was not found')
     update_item_encoded = jsonable_encoder(gem)
     update_item_encoded.pop('id', None)
     for key, val in update_item_encoded.items():
@@ -59,6 +65,8 @@ def update_gem(gem_id: int, gem: Gem):
 @app.delete('/gems/{gem_id}', status_code=status.HTTP_204_NO_CONTENT)
 def delete_gem(gem_id: int):
     gem_found = session.get(Gem, gem_id)
+    if not gem_found:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Gem with an id: {gem_id} was not found')
     session.delete(gem_found)
     session.commit()
     return {"msg": f'Deleted gem with an id {gem_id}'}

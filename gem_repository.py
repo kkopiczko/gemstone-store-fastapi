@@ -1,3 +1,4 @@
+from fastapi import status, HTTPException
 from db import engine
 from models.gem_models import Gem, GemProperties
 from sqlmodel import Session, select
@@ -15,4 +16,4 @@ def select_gem_by_id(gem_id):
         statement = select(Gem, GemProperties).where(Gem.properties_id == GemProperties.id)
         statement = statement.where(Gem.id == gem_id)
         result = session.exec(statement)
-        return result.one()
+        return result.first()
