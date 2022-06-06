@@ -1,4 +1,6 @@
-from fastapi import FastAPI, status, HTTPException
+from fastapi import FastAPI, HTTPException
+from starlette import status
+from starlette.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 import uvicorn
 from sqlmodel import SQLModel, Session
@@ -20,9 +22,9 @@ def get_gems():
 
 @app.get('/gems/{gem_id}')
 def get_gem_by_id(gem_id: int):
-    gem = gem_repository.select_gem_by_id(gem_id)
+    gem = session.get(Gem, gem_id)
     if not gem:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Gem with an id: {gem_id} was not found')
+        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content=f'Gem with an id: {gem_id} was not found')
     return {'gem': gem}
 
 @app.post('/gems')
@@ -41,7 +43,8 @@ def create_gem(gem_pr: GemProperties, gem: Gem):
 def patch_gem(gem_id: int, gem: GemPatch):
     gem_found = session.get(Gem, gem_id)
     if not gem_found:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Gem with an id: {gem_id} was not found')
+        # raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Gem with an id: {gem_id} was not found')
+        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content=f'Gem with an id: {gem_id} was not found')
     update_data = gem.dict(exclude_unset=True)
     for key, val in update_data.items():
         gem_found.__setattr__(key, val)
