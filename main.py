@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, status
 from fastapi.encoders import jsonable_encoder
 import uvicorn
 from sqlmodel import SQLModel, Session
@@ -55,6 +55,13 @@ def update_gem(gem_id: int, gem: Gem):
     session.commit()
     session.refresh(gem_found)
     return gem_found
+
+@app.delete('/gems/{gem_id}', status_code=status.HTTP_204_NO_CONTENT)
+def delete_gem(gem_id: int):
+    gem_found = session.get(Gem, gem_id)
+    session.delete(gem_found)
+    session.commit()
+    return {"msg": f'Deleted gem with an id {gem_id}'}
 
 
 if __name__ == '__main__':
