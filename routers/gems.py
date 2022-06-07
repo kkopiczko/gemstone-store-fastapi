@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Response
 from starlette import status
 from starlette.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
@@ -65,4 +65,4 @@ def delete_gem(gem_id: int):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Gem with an id: {gem_id} was not found')
     session.delete(gem_found)
     session.commit()
-    return {"msg": f'Deleted gem with an id {gem_id}'}
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
