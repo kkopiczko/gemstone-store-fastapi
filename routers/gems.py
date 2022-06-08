@@ -4,7 +4,7 @@ from starlette.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from db import session
 from models.gem_models import Gem, GemProperties, GemPatch
-import gem_repository
+import repos.gem_repository as gem_repository
 
 router = APIRouter(prefix='/gems', tags=['Gems'])
 
