@@ -23,3 +23,7 @@ class UserCreate(SQLModel):
         if 'password' in values and v != values['password']:
             raise ValueError('passwords don\'t match')
         return v
+
+class UserLogin(SQLModel):
+    username: str
+    password: str
