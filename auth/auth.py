@@ -3,6 +3,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from passlib.context import CryptContext
 import datetime
 import jwt
+from repos.user_repository import get_user_by_id
 
 class AuthHandler:
     security = HTTPBearer()
@@ -34,3 +35,18 @@ class AuthHandler:
 
     def auth_wrapper(self, auth: HTTPAuthorizationCredentials = Security(security)):
         return self.decode_token(auth.credentials)
+
+    def get_current_user(self, auth: HTTPAuthorizationCredentials = Security(security)):
+        credentials_exception = HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='Could not decode token'
+        )
+        user_id = self.decode_token(auth.credentials)
+        if user_id is None:
+            raise credentials_exception
+        current_user = get_user_by_id(user_id=user_id)
+        if current_user is None:
+            raise credentials_exception
+        return current_user
+        
+        

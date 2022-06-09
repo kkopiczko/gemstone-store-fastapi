@@ -26,4 +26,5 @@ def login(user_credentials: UserLogin):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid credentials')
     if not auth_handler.verify_password(user_credentials.password, user_found.hashed_password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid credentials')
-    return {'token': 'bearer'}
+    token = auth_handler.encode_token(user_found.id)
+    return {'token': token}

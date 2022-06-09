@@ -13,3 +13,8 @@ def get_user(name):
         statement = select(User).where(User.username == name)
         res = session.exec(statement).first()
         return res
+
+def get_user_by_id(user_id):
+    with Session(engine) as session:
+        res = session.get(User, user_id)
+        return res
