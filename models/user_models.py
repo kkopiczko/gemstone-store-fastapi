@@ -5,9 +5,9 @@ from pydantic import validator, EmailStr
 import datetime
 
 class User(SQLModel, table=True):
-    id: Optional[str] = Field(primary_key=True)
-    username: str
-    password: str
+    id: Optional[int] = Field(primary_key=True)
+    username: str = Field(index=True)
+    hashed_password: str = Field(max_length=256, min_length=6)
     email: EmailStr
     created_at: datetime.datetime = datetime.datetime.now()
     is_seller: bool = False

@@ -6,10 +6,10 @@ import jwt
 
 class AuthHandler:
     security = HTTPBearer()
-    pwd_context = CryptContext(schemas=['bcrypt'])
+    pwd_context = CryptContext(schemes=['bcrypt'])
     secret = 'supersecret'
 
-    def get_password_hast(self, plain_password):
+    def get_password_hash(self, plain_password):
         return self.pwd_context.hash(plain_password)
 
     def verify_password(self, plain_password, hashed_password):
