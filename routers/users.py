@@ -23,7 +23,7 @@ def register(user: UserCreate):
 def login(user_credentials: UserLogin):
     user_found = get_user(user_credentials.username)
     if not user_found:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'User with login: {user_credentials.username} does not exist')
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid credentials')
     if not auth_handler.verify_password(user_credentials.password, user_found.hashed_password):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Wrong password')
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid credentials')
     return {'token': 'bearer'}
