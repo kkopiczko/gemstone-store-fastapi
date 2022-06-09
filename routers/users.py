@@ -1,12 +1,17 @@
 from fastapi import APIRouter, HTTPException, status
 from auth.auth import AuthHandler
 from models.user_models import UserCreate, User, UserLogin
-from repos.user_repository import get_user
+from repos.user_repository import get_user, select_all_users
 from db import session
 from starlette.responses import JSONResponse
+from typing import List
 
 router = APIRouter(prefix='/users', tags=['Users'])
 auth_handler = AuthHandler()
+
+@router.get('/', response_model=List[User])
+def get_all_users():
+    return select_all_users()
 
 @router.post('/register')
 def register(user: UserCreate):
