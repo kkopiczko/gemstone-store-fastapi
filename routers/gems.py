@@ -78,7 +78,7 @@ def delete_gem(gem_id: int, current_user=Depends(auth_handler.get_current_user))
 @router.get('/seller/me')
 def get_my_gems(current_user=Depends(auth_handler.get_current_user)):
     if not current_user.is_seller:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED)
+        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content='You are not a seller')
     statement = select(Gem, GemProperties).where(Gem.properties_id == GemProperties.id)
     statement = statement.where(Gem.seller_id == current_user.id)
     result = session.exec(statement)
