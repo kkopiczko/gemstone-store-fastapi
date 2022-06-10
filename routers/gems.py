@@ -5,7 +5,7 @@ from starlette.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from sqlmodel import select
 from db import session
-from models.gem_models import Gem, GemProperties, GemPatch
+from models.gem_models import Gem, GemProperties, GemPatch, GemType
 import repos.gem_repository as gem_repository
 from auth.auth import AuthHandler
 from typing import Optional
@@ -14,12 +14,14 @@ router = APIRouter(prefix='/gems', tags=['Gems'])
 auth_handler = AuthHandler()
 
 @router.get('/')
-def get_gems(lte: Optional[int]=None, gte: Optional[int]=None):
+def get_gems(lte: Optional[int]=None, gte: Optional[int]=None, type: Optional[GemType] = None):
     gems_statement = select(Gem, GemProperties).join(GemProperties)
     if lte:
         gems_statement = gems_statement.where(Gem.price <= lte)
     if gte:
         gems_statement = gems_statement.where(Gem.price >= gte)
+    if type:
+        gems_statement = gems_statement.where(Gem.type == type)
     gems = session.exec(gems_statement).all()
     return {'gems': gems}
 
