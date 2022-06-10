@@ -8,13 +8,19 @@ from db import session
 from models.gem_models import Gem, GemProperties, GemPatch
 import repos.gem_repository as gem_repository
 from auth.auth import AuthHandler
+from typing import Optional
 
 router = APIRouter(prefix='/gems', tags=['Gems'])
 auth_handler = AuthHandler()
 
 @router.get('/')
-def get_gems():
-    gems = gem_repository.select_all_gems()
+def get_gems(lte: Optional[int]=None, gte: Optional[int]=None):
+    gems_statement = select(Gem, GemProperties).join(GemProperties)
+    if lte:
+        gems_statement = gems_statement.where(Gem.price <= lte)
+    if gte:
+        gems_statement = gems_statement.where(Gem.price >= gte)
+    gems = session.exec(gems_statement).all()
     return {'gems': gems}
 
 @router.get('/{gem_id}')
