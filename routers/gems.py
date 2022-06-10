@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, Response, Depends
 from starlette import status
 from starlette.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
+from sqlmodel import select
 from db import session
 from models.gem_models import Gem, GemProperties, GemPatch
 import repos.gem_repository as gem_repository
@@ -70,5 +71,12 @@ def delete_gem(gem_id: int, current_user=Depends(auth_handler.get_current_user))
     session.delete(gem_found)
     session.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+@router.get('/seller/me')
+def get_my_gems(current_user=Depends(auth_handler.get_current_user)):
+    statement = select(Gem, GemProperties).where(Gem.properties_id == GemProperties.id)
+    statement = statement.where(Gem.seller_id == current_user.id)
+    result = session.exec(statement)
+    return result.all()
 
 
