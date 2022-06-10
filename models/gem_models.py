@@ -2,6 +2,7 @@
 from sqlmodel import SQLModel, Field, Relationship
 from enum import Enum as Enum_
 from typing import Optional
+from models.user_models import User
 
 class Enum(Enum_):
     @classmethod
@@ -41,6 +42,8 @@ class Gem(SQLModel, table=True):
     is_available: bool = True
     properties_id: Optional[int] = Field(default=None, foreign_key='gemproperties.id')
     properties: Optional[GemProperties] = Relationship(back_populates='gem')
+    seller_id: Optional[int] = Field(default=None, foreign_key='user.id')
+    seller: Optional[User] = Relationship()
     
 class GemPatch(SQLModel):
     price:  Optional[float]
