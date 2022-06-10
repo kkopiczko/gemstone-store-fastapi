@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException, Response, Depends
+from sqlalchemy import true
 from starlette import status
 from starlette.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
@@ -33,6 +34,8 @@ def create_gem(gem_pr: GemProperties, gem: Gem, current_user=Depends(auth_handle
     session.add(gem_)
     session.commit()
     session.refresh(gem_)
+    if not current_user.is_seller: 
+        current_user.is_seller = true
     return gem_
 
 @router.patch('/{gem_id}')
@@ -74,6 +77,8 @@ def delete_gem(gem_id: int, current_user=Depends(auth_handler.get_current_user))
 
 @router.get('/seller/me')
 def get_my_gems(current_user=Depends(auth_handler.get_current_user)):
+    if not current_user.is_seller:
+        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED)
     statement = select(Gem, GemProperties).where(Gem.properties_id == GemProperties.id)
     statement = statement.where(Gem.seller_id == current_user.id)
     result = session.exec(statement)
