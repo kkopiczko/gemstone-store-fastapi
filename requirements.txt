@@ -5,3 +5,5 @@ alembic
 pyJWT
 bcrypt
 passlib
+
+eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NTQ4NTMzODgsImlhdCI6MTY1NDg1MTU4OCwic3ViIjoyfQ.3LEACmtI0uKq9RBjarKy4gGmO3HPqsoO19bfSvD9d7I

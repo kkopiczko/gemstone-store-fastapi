@@ -5,8 +5,10 @@ from fastapi.encoders import jsonable_encoder
 from db import session
 from models.gem_models import Gem, GemProperties, GemPatch
 import repos.gem_repository as gem_repository
+from auth.auth import AuthHandler
 
 router = APIRouter(prefix='/gems', tags=['Gems'])
+auth_handler = AuthHandler()
 
 @router.get('/')
 def get_gems():
@@ -21,12 +23,12 @@ def get_gem_by_id(gem_id: int):
     return {'gem': gem}
 
 @router.post('/')
-def create_gem(gem_pr: GemProperties, gem: Gem):
+def create_gem(gem_pr: GemProperties, gem: Gem, current_user=Depends(auth_handler.get_current_user)):
     gem_properties = GemProperties(size=gem_pr.size, color=gem_pr.color, clarity=gem_pr.clarity)
     session.add(gem_properties)
     session.commit()
     session.refresh(gem_properties)
-    gem_ = Gem(price=gem.price, type=gem.type, is_available=gem.is_available, properties_id=gem_properties.id)
+    gem_ = Gem(price=gem.price, type=gem.type, is_available=gem.is_available, properties_id=gem_properties.id, seller_id=current_user.id)
     session.add(gem_)
     session.commit()
     session.refresh(gem_)
@@ -59,10 +61,14 @@ def update_gem(gem_id: int, gem: Gem):
     return gem_found
 
 @router.delete('/{gem_id}', status_code=status.HTTP_204_NO_CONTENT)
-def delete_gem(gem_id: int):
+def delete_gem(gem_id: int, current_user=Depends(auth_handler.get_current_user)):
     gem_found = session.get(Gem, gem_id)
     if not gem_found:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Gem with an id: {gem_id} was not found')
+    if gem_found.seller_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="You are not authorized to delete this gem")
     session.delete(gem_found)
     session.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
